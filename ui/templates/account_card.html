@@ -1,0 +1,10 @@
+<div class="acc-grid">
+{% for a in accounts %}
+  <div class="acc acc-{{ a.tone }}">
+    <b class="t">{{ a.name }} Account</b>
+    <span>Total Stok:</span> <em>{{ a.total_stok|num }}</em><br>
+    <span>Total Keluar:</span> <em>{{ a.keluar|num }}</em><br>
+    <span>Stok Akhir:</span> <em>{{ a.stok_akhir|num }}</em>
+  </div>
+{% endfor %}
+</div>

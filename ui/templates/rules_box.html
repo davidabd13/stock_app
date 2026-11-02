@@ -1,0 +1,4 @@
+<div class="rule-title">Aturan DSI &amp; Notif PO:</div>
+{% for r in rules %}
+<div class="rule {{ r.cls }}"><b>{{ r.label }}:</b> DSI &lt; {{ r.g }} ({{ 'Hijau - Push PO' }}) | DSI {{ r.g }}–&lt;{{ r.m }} (Normal) | DSI ≥ {{ r.m }} (Merah - Manage PO).</div>
+{% endfor %}

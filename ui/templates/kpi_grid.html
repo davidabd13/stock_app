@@ -1,0 +1,12 @@
+<div class="kpi-grid">
+{% for k in items %}
+  {% if k.size == 'sm' %}
+  <div class="kpi sm kpi-sm-{{ k.tone or 'blue' }}"><div class="kpi-label">{{ k.label }}</div><div class="kpi-value">{{ k.value }}</div>{% if k.sub %}<div class="kpi-sub">{{ k.sub }}</div>{% endif %}</div>
+  {% else %}
+  <div class="kpi kpi-{{ k.tone or 'green' }}">
+    <div><div class="kpi-label">{{ k.label }}</div><div class="kpi-value">{{ k.value }}</div>{% if k.sub %}<div class="kpi-sub">{{ k.sub }}</div>{% endif %}</div>
+    <div class="kpi-ico">{{ k.icon or '' }}</div>
+  </div>
+  {% endif %}
+{% endfor %}
+</div>

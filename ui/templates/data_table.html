@@ -1,0 +1,7 @@
+<div class="tbl-wrap"><table class="dt">
+<thead><tr>{% for c in cols %}<th class="{{ c.align }}">{{ c.label }}</th>{% endfor %}</tr></thead>
+<tbody>
+{% for row in rows %}<tr>{% for cell in row %}<td class="{{ cell.cls }}">{% if cell.pill %}<span class="pill {{ cell.pill }}">{{ cell.text }}</span>{% else %}{{ cell.text }}{% endif %}</td>{% endfor %}</tr>
+{% endfor %}
+</tbody></table></div>
+{% if note %}<div class="tbl-note">{{ note }}</div>{% endif %}
