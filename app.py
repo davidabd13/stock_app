@@ -22,6 +22,15 @@ if is_admin():
 
 nav = st.navigation(pages, position="top")
 
+# Dropdown pindah halaman untuk tampilan mobile (disembunyikan di desktop lewat CSS: .st-key-mobile-nav)
+_page_by_label = {f"{p.icon} {p.title}": p for p in pages}
+_labels = list(_page_by_label)
+_current = next((lb for lb, p in _page_by_label.items() if p.title == nav.title), _labels[0])
+
+
+def _go_page():
+    st.switch_page(_page_by_label[st.session_state["mobile_nav"]])
+
 c1, c2, c3, c4 = st.columns([5, 2.4, 0.6, 1.1], vertical_alignment="center")
 with c1:
     html("header.html", today=today_id())
@@ -34,5 +43,9 @@ with c3:
 with c4:
     if st.button("🚪 Keluar", key="btn_logout", help=f"Login sebagai {current_user()['name']}"):
         logout()
+
+with st.container(key="mobile-nav"):
+    st.session_state["mobile_nav"] = _current   # selalu sinkron dengan halaman aktif
+    st.selectbox("Menu", _labels, key="mobile_nav", label_visibility="collapsed", on_change=_go_page)
 
 nav.run()

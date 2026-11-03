@@ -466,6 +466,22 @@ table.dt td.blue {
   color: #fff;
   border-color: #047857;
 }
+/* ---------- Dropdown menu (hanya tampil di mobile) ---------- */
+.st-key-mobile-nav {
+  display: none;
+}
+@media (max-width: 768px) {
+  .st-key-mobile-nav {
+    display: block;
+  }
+  .st-key-mobile-nav [data-baseweb="select"] > div {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-weight: 700;
+    min-height: 44px;
+  }
+}
 @media (max-width: 900px) {
   .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

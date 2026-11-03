@@ -63,7 +63,8 @@ def _code_cell(v):
 
 def sellin_template(master_outlet: pd.DataFrame, master_sku: pd.DataFrame,
                     sku_map: pd.DataFrame | None = None, rows: int = 500) -> bytes:
-    """Template sell-in: dropdown id_outlet & kode_sku (kode principle) + nama terisi otomatis (VLOOKUP).
+    """Template sell-in: dropdown NAMA TOKO (bisa diedit/diketik) & kode_sku (kode principle).
+    id_outlet dan nama produk terisi otomatis lewat lookup (sales cukup tahu nama toko).
 
     Bila sku_map (tabel sku_principle) kosong, template memakai id_product seperti versi lama.
     """
@@ -73,12 +74,12 @@ def sellin_template(master_outlet: pd.DataFrame, master_sku: pd.DataFrame,
     wb = Workbook()
     ws = wb.active
     ws.title = "Template_SellIn"
-    heads = ["date", "id_outlet", "outlet", sku_head, "product", "qty", "notes"]
+    heads = ["date", "outlet", "id_outlet", sku_head, "product", "qty", "notes"]
     ws.append(heads)
 
     mo = wb.create_sheet("Master_Outlet")
     mo.append(["id_outlet", "outlet", "account", "area_fix"])
-    for r in master_outlet.sort_values(["account", "outlet"]).itertuples():
+    for r in master_outlet.sort_values(["outlet", "account"]).itertuples():
         mo.append([r.id_outlet, r.outlet, r.account, getattr(r, "area_fix", None)])
     ms = wb.create_sheet("Master_SKU")
     if use_kode:
@@ -96,12 +97,18 @@ def sellin_template(master_outlet: pd.DataFrame, master_sku: pd.DataFrame,
         n_sku = len(master_sku)
 
     info = wb.create_sheet("Petunjuk")
-    for line in ["CARA PAKAI",
-                 f"1. Isi sheet Template_SellIn: date, id_outlet (pilih dari dropdown), {sku_head} (dropdown / ketik kode), qty.",
-                 "2. Kolom outlet & product (abu-abu) terisi otomatis, jangan diubah. Jika product kosong = kode tidak dikenal.",
-                 "3. Format tanggal dd/mm/yyyy. qty = jumlah sell-in (pcs), angka ≥ 0.",
-                 "4. Jangan ubah nama header. Jangan hapus sheet Master_*.",
-                 "5. Satu baris per tanggal + outlet + SKU. Upload kembali di menu Input Sell-in."]:
+    dup_names = (master_outlet.assign(_k=master_outlet["outlet"].astype(str).str.strip().str.upper())
+                 .groupby("_k")["id_outlet"].nunique())
+    n_dup = int((dup_names > 1).sum())
+    lines = ["CARA PAKAI",
+             f"1. Isi sheet Template_SellIn: date, outlet (NAMA TOKO: pilih dari dropdown atau ketik), {sku_head} (dropdown / ketik kode), qty.",
+             "2. Kolom id_outlet & product (abu-abu) terisi otomatis, jangan diubah. Jika id_outlet kosong = nama toko tidak ada di Master_Outlet; jika product kosong = kode tidak dikenal.",
+             "3. Format tanggal dd/mm/yyyy. qty = jumlah sell-in (pcs), angka ≥ 0.",
+             "4. Jangan ubah nama header. Jangan hapus sheet Master_*.",
+             "5. Satu baris per tanggal + toko + SKU. Upload kembali di menu Input Sell-in."]
+    if n_dup:
+        lines.append(f"6. Ada {n_dup} nama toko yang dipakai lebih dari satu outlet. Untuk toko tersebut isi juga kolom id_outlet secara manual (lihat sheet Master_Outlet).")
+    for line in lines:
         info.append([line])
     info.column_dimensions["A"].width = 100
     info["A1"].font = Font(bold=True, size=13)
@@ -110,18 +117,21 @@ def sellin_template(master_outlet: pd.DataFrame, master_sku: pd.DataFrame,
     for c in ws[1]:
         c.fill, c.font = _HEAD, Font(bold=True, color="FFFFFF")
     for r in range(2, rows + 2):
-        ws[f"C{r}"] = f'=IFERROR(VLOOKUP(B{r},Master_Outlet!$A:$B,2,FALSE),"")'
+        ws[f"C{r}"] = f'=IF(TRIM(B{r})="","",IFERROR(INDEX(Master_Outlet!$A:$A,MATCH(TRIM(B{r}),Master_Outlet!$B:$B,0)),""))'
         ws[f"E{r}"] = f'=IFERROR(VLOOKUP(D{r},Master_SKU!$A:$B,2,FALSE),"")'
         ws[f"C{r}"].fill = ws[f"E{r}"].fill = grey
         ws[f"A{r}"].number_format = "DD/MM/YYYY"
     n_o, n_s = max(len(master_outlet), 1) + 1, max(n_sku, 1) + 1
-    dv_o = DataValidation(type="list", formula1=f"=Master_Outlet!$A$2:$A${n_o}", allow_blank=True)
+    # errorStyle="warning": nama toko boleh diedit/diketik bebas; nama di luar master hanya diberi peringatan
+    dv_o = DataValidation(type="list", formula1=f"=Master_Outlet!$B$2:$B${n_o}", allow_blank=True, errorStyle="warning",
+                          errorTitle="Nama toko tidak ada di master",
+                          error="Nama toko ini tidak ditemukan di Master_Outlet. Lanjutkan hanya jika Anda yakin.")
     dv_s = DataValidation(type="list", formula1=f"=Master_SKU!$A$2:$A${n_s}", allow_blank=True)
     dv_q = DataValidation(type="whole", operator="greaterThanOrEqual", formula1="0", allow_blank=True)
     for dv, col in ((dv_o, "B"), (dv_s, "D"), (dv_q, "F")):
         ws.add_data_validation(dv)
         dv.add(f"{col}2:{col}{rows + 1}")
-    for col, w in zip("ABCDEFG", [14, 14, 34, 16, 44, 10, 28]):
+    for col, w in zip("ABCDEFG", [14, 38, 14, 16, 44, 10, 28]):
         ws.column_dimensions[col].width = w
     for sh in (mo, ms):
         for c in sh[1]:

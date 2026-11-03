@@ -29,7 +29,8 @@ sql/schema.sql            query Postgres/Supabase
 4. `streamlit run app.py`
 5. Login admin → menu **Upload Stock** → upload CSV raw_oos.
 6. Supabase → SQL Editor → jalankan `sql/sku_principle.sql` (master kode SKU principle → id_product). Cek 3 query di bagian bawah file itu.
-7. Mulai input sell-in di menu **Input Sell-in**. Template sell-in memakai kolom `kode_sku` (kode principle); sistem menerjemahkannya ke `id_product` saat upload.
+7. Mulai input sell-in di menu **Input Sell-in**. Template sell-in memakai **nama toko** (`outlet`, dropdown/bisa diketik) dan `kode_sku` (kode principle); kolom `id_outlet` terisi otomatis dari nama toko, dan sistem menerjemahkan `kode_sku` ke `id_product` saat upload. Bila ada nama toko kembar, isi `id_outlet` manual.
+8. Di tampilan mobile, menu pindah halaman tersedia sebagai dropdown di bawah header.
 
 ## Rumus
 - Total Keluar (per interval dua snapshot stok) = Stok sebelumnya + Sell-in − Stok berikutnya (min 0)

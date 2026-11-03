@@ -92,7 +92,7 @@ with st.container(key="card-form"):
 
     # ---------------------------------------------------------- upload Excel
     with t_excel:
-        st.markdown("**Langkah:** 1) unduh template → 2) isi (dropdown outlet & SKU dari master) → 3) upload → 4) cek validasi → 5) simpan.")
+        st.markdown("**Langkah:** 1) unduh template → 2) isi nama toko (dropdown / ketik; ID outlet terisi otomatis) & kode SKU → 3) upload → 4) cek validasi → 5) simpan.")
         st.download_button("⬇️ Unduh Template Sell-in (+ Master Outlet & SKU)", sellin_template(mo, ms, sku_map), "Template_SellIn.xlsx",
                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="dl_tpl")
         up = st.file_uploader("Upload file sell-in (.xlsx / .csv)", type=["xlsx", "csv"], key="si_up")
@@ -110,7 +110,7 @@ with st.container(key="card-form"):
                 m1.metric("Baris valid", len(valid))
                 m2.metric("Baris ditolak", len(rejected))
                 if not rejected.empty:
-                    st.error("Baris berikut ditolak (periksa penamaan / ID):")
+                    st.error("Baris berikut ditolak (periksa penulisan nama toko / kode SKU):")
                     st.dataframe(rejected, hide_index=True)
                 if not valid.empty:
                     pv = valid.merge(mo[["id_outlet", "outlet"]], on="id_outlet").merge(ms, on="id_product")
