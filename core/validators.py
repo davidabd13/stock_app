@@ -15,10 +15,20 @@ def read_any(file, sheet: str | None = None) -> pd.DataFrame:
 
 
 def _parse_date(s: pd.Series) -> pd.Series:
-    # Format sumber: dd/mm/yyyy. Excel kadang memberi yyyy-mm-dd; keduanya aman.
-    iso = pd.to_datetime(s, format="%Y-%m-%d", errors="coerce")
-    dmy = pd.to_datetime(s, format="%d/%m/%Y", errors="coerce")
-    return iso.fillna(dmy).fillna(pd.to_datetime(s, dayfirst=True, errors="coerce"))
+    """Parse tanggal tanpa menebak hari/bulan.
+
+    1) yyyy-mm-dd (boleh + jam, mis. sel tanggal Excel '2026-11-04 00:00:00') -> ISO, tahun di depan = pasti.
+    2) dd/mm/yyyy atau dd-mm-yyyy (format Indonesia).
+    3) Sisanya (mis. '4 Nov 2026') baru memakai dayfirst.
+    """
+    s = s.astype(str).str.strip()
+    out = pd.to_datetime(s, format="ISO8601", errors="coerce")
+    for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
+        out = out.fillna(pd.to_datetime(s, format=fmt, errors="coerce"))
+    rest = out.isna() & (s != "")
+    if rest.any():
+        out = out.fillna(pd.to_datetime(s.where(rest), dayfirst=True, errors="coerce"))
+    return out.dt.normalize()
 
 
 def clean_stock(df_raw: pd.DataFrame):

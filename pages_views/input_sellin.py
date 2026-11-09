@@ -106,6 +106,12 @@ with st.container(key="card-form"):
             else:
                 for w in warns:
                     st.warning(w)
+                if not valid.empty:   # tanggal di luar kewajaran = kemungkinan salah format
+                    _d = pd.to_datetime(valid["date"])
+                    _odd = (_d > pd.Timestamp(date.today())) | (_d < pd.Timestamp(date.today()) - pd.Timedelta(days=31))
+                    if _odd.any():
+                        st.warning(f"{int(_odd.sum())} baris bertanggal lebih dari 31 hari lalu atau di masa depan "
+                                   f"({_d[_odd].min():%d/%m/%Y} – {_d[_odd].max():%d/%m/%Y}). Pastikan tanggalnya benar sebelum disimpan.")
                 m1, m2 = st.columns(2)
                 m1.metric("Baris valid", len(valid))
                 m2.metric("Baris ditolak", len(rejected))
@@ -114,6 +120,7 @@ with st.container(key="card-form"):
                     st.dataframe(rejected, hide_index=True)
                 if not valid.empty:
                     pv = valid.merge(mo[["id_outlet", "outlet"]], on="id_outlet").merge(ms, on="id_product")
+                    pv["date"] = pv["date"].dt.strftime("%d/%m/%Y")
                     st.dataframe(pv[["date", "outlet", "product", "qty", "notes"]], hide_index=True, height=260)
                     if st.button("🚀 Simpan ke Database", type="primary", key="si_save_x"):
                         ok, errs = upsert_sellin(valid, "excel", user)
