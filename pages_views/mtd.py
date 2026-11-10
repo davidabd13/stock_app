@@ -16,7 +16,7 @@ months = sorted(flow["date"].dt.to_period("M").unique(), reverse=True)
 SEMUA_ACC, SEMUA_TOKO, SEMUA_STATUS = "Semua Account", "Semua Toko", "Semua Status PO"
 
 with st.container(key="card-mtd"):
-    card_title("Analisa 1 Bulan Penuh (MTD) & Master Data", "Filter berdasarkan account, toko, status PO, dan bulan")
+    card_title("Analisa 1 Bulan Penuh (MTD) & Master Data", "Filter berdasarkan account, nama toko, status PO, dan bulan")
     f_acc, f_toko, f_stat, f_bln = st.columns([2, 3, 2, 1.6], vertical_alignment="bottom")
 
     # Bulan dipilih lebih dulu karena daftar account/toko mengikuti data bulan tsb

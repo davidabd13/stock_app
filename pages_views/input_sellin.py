@@ -35,7 +35,7 @@ if st.session_state.pop("_do_reset", False):   # reset aman: dilakukan sebelum w
 # ================================================================== FORM CARD
 with st.container(key="card-form"):
     card_title("Form Update & Input Stok Produk", "Data yang diinput langsung tersimpan otomatis ke Supabase.")
-    t_form, t_excel, t_bulk = st.tabs(["✍️ Input Form", "📁 Upload Excel Sell-in", "🗂️ Input Banyak SKU (per Toko)"])
+    t_form, t_excel, t_bulk = st.tabs(["✍️ Input Form", "📁 Upload Excel Sell-in", "🗂️ Input Semua SKU (per Toko)"])
 
     # ---------------------------------------------------------- form tunggal
     with t_form:
