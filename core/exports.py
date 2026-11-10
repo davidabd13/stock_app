@@ -13,9 +13,10 @@ _HEAD = PatternFill("solid", fgColor="1E3A8A")
 _FILL = {s: PatternFill("solid", fgColor=c.lstrip("#")) for s, c in STATUS_COLORS.items()}
 
 
-def summary_table(pairs: pd.DataFrame) -> pd.DataFrame:
-    """Format kolom export (mengikuti Stock_Dashboard_GoogleSheets_Export)."""
-    t = pairs.sort_values(["account", "outlet", "product"])
+def summary_table(pairs: pd.DataFrame, sort: bool = True) -> pd.DataFrame:
+    """Format kolom export (mengikuti Stock_Dashboard_GoogleSheets_Export).
+    sort=False -> pertahankan urutan baris dari pemanggil."""
+    t = pairs.sort_values(["account", "outlet", "product"]) if sort else pairs
     return pd.DataFrame({
         "Account": t["account"], "Toko": t["outlet"], "Produk": t["product"],
         "Stok Awal": t["stok_awal"].astype(int), "Stok Tambah": t["stok_tambahan"].astype(int),
