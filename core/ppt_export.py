@@ -90,7 +90,7 @@ def build_dashboard_ppt(pairs, flow_f, f) -> bytes:
     s.background.fill.solid()
     s.background.fill.fore_color.rgb = _rgb(NAVY)
     _text(s, 0.8, 2.5, 11.5, 1, "Stock Dashboard & Analysis", 40, True, "FFFFFF")
-    _text(s, 0.8, 3.5, 11.5, 0.5, "PT Ultra Jaya Inventory System", 18, color="93C5FD")
+    _text(s, 0.8, 3.5, 11.5, 0.5, "PT Ultrajaya Inventory System", 18, color="93C5FD")
     _text(s, 0.8, 4.1, 11.5, 0.5, f"Periode {periode} · SPD = Total Keluar / {f.hari} hari", 14, color="CBD5E1")
 
     # 2. KPI
